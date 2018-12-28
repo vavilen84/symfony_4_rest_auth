@@ -1,2 +1,12 @@
-# symfony_4_rest_auth
-Symfony 4 basic REST auth implementation
+
+##  Install docker-hostmanager
+
+https://github.com/iamluc/docker-hostmanager
+
+#### Installation on Ubuntu
+
+https://github.com/iamluc/docker-hostmanager#linux
+
+```
+docker run -d --name docker-hostmanager --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v /etc/hosts:/hosts iamluc/docker-hostmanager
+```
