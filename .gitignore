@@ -1,12 +1,7 @@
-
-###> symfony/framework-bundle ###
-/.env.local
+/.env
 /.env.*.local
 /public/bundles/
 /var/
 /vendor/
-###< symfony/framework-bundle ###
+.idea
 
-###> phpunit/phpunit ###
-/phpunit.xml
-###< phpunit/phpunit ###
