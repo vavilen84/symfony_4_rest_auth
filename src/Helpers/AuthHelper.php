@@ -4,6 +4,8 @@ namespace App\Helpers;
 
 class AuthHelper
 {
+    const API_KEY_HEADER_NAME = 'X-API-KEY';
+
     public static function generateApiKey(): string
     {
         $result = sha1(self::generateRandomString());

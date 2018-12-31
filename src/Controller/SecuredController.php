@@ -4,17 +4,18 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use FOS\RestBundle\Controller\Annotations\Get;
 
+/**
+ * @Route("/secured")
+ */
 class SecuredController extends AbstractController
 {
     /**
-     * @Route("/secured", name="secured")
+     * @Get("/index")
      */
     public function index()
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/SecuredController.php',
-        ]);
+        return $this->json(['data' => 'Success!']);
     }
 }

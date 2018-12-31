@@ -15,6 +15,7 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         auth:
+            stateless: true
             pattern: ^/auth
             logout: ~
             anonymous: ~
@@ -22,14 +23,15 @@ security:
                 authenticators:
                   - app.security.auth_login_authenticator
         secured:
+            stateless: true
             pattern: ^/secured
             logout: ~
             anonymous: ~
             guard:
                 authenticators:
                   - app.security.api_key_authenticator
-        main:
-            anonymous: true
+#        main:
+#            anonymous: true
 
             # activate different ways to authenticate
 

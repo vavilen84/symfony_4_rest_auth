@@ -18,12 +18,10 @@ class AuthController extends AbstractController
      */
     public function loginAction(RedisService $redisService)
     {
-        echo 123;
-//        $user = $this->getUser();
-//        $apiKey = AuthHelper::generateApiKey();
-//        $redisService->setApiKey($user, $apiKey);
-//        $view = $this->view(['api_key' => $apiKey], 200);
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $apiKey = AuthHelper::generateApiKey();
+        $redisService->setApiKey($user, $apiKey);
 
-        //return $this->handleView($view);
+        return $this->json(['api_key' => $apiKey]);
     }
 }

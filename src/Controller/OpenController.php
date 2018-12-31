@@ -3,18 +3,19 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use FOS\RestBundle\Controller\Annotations\Get;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * @Route("/open")
+ */
 class OpenController extends AbstractController
 {
     /**
-     * @Route("/open", name="open")
+     * @Get("/index")
      */
-    public function index()
+    public function indexAction()
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/OpenController.php',
-        ]);
+        return $this->json(['data' => 'Success!']);
     }
 }

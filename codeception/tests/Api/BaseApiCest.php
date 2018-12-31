@@ -3,58 +3,67 @@
 namespace App\Tests\Api;
 
 use \ApiTester;
+use App\DataFixtures\AppFixtures;
 
 class BaseApiCest
 {
-    protected $apiKey;
-    protected $userEmail;
-    protected $userPassword = '123456qwertyQ1!';
+    protected $validEmail;
+    protected $validPassword;
+    protected $notValidEmail = 'not_email';
+    protected $badEmail = 'invalid@email.com';
+    protected $invalidPassword = 'invalid_password';
+    protected $loginUrl = '/auth/login';
+    protected $usernameNotFoundMessage = 'Username could not be found';
+    protected $invalidCredentialsMessage = 'Invalid credentials';
+    protected $securePageUrl = '/secured/index';
+    protected $apiKeyHeaderName = 'X-API-KEY';
 
     public function _before(ApiTester $I)
     {
-//        $this->setHomePathAlias();
-//        $this->setHttpHeaders($I);
-//        $this->cleanDb();
-//        $this->setDefaults();
+        $this->setRequestData();
+        $this->setRequestHeaders($I);
     }
 
-    protected function setDefaults()
+    protected function setRequestData()
     {
-//        $this->userEmail = UserFixtures::USER_1['email'];
-//        $this->userPassword = UserFixtures::PASSWORD;
+        $this->validEmail = AppFixtures::USERS[1]['email'];
+        $this->validPassword = AppFixtures::USERS[1]['password'];
     }
 
-    protected function setHomePathAlias()
+    protected function setRequestHeaders(ApiTester $I)
     {
-//        Yii::setAlias('@home', '/var/www/revolve');
+        $I->haveHttpHeader('Accept', 'application/json');
+        $I->haveHttpHeader('Content-Type', 'application/json');
     }
 
-    protected function setHttpHeaders(ApiTester $I)
+    protected function sendBadLoginRequest(ApiTester $I, $email, $password, $message)
     {
-//        $I->haveHttpHeader('Accept', 'application/json');
-//        $I->haveHttpHeader('Content-Type', 'application/json');
+        $I->sendPOST('/auth/login', [
+            'email' => $email,
+            'password' => $password
+        ]);
+        $I->cantSeeResponseCodeIs(200);
+        $I->seeResponseContains($message);
     }
 
-    protected function cleanDb()
+    protected function sendSuccessLoginRequest(ApiTester $I, $email, $password): string
     {
-//        ConsoleHelper::runConsoleCommand('database/drop-tables');
-//        ConsoleHelper::runConsoleCommand('database/restore-dump');
+        $I->sendPOST('/auth/login', [
+            'email' => $email,
+            'password' => $password
+        ]);
+        $I->seeResponseCodeIs(200);
+        $apiKey = $this->getApiKeyFromResponse($I);
+        $I->assertEquals(!empty($apiKey), true, "Api Key is empty");
+
+        return $apiKey;
     }
 
-    protected function login(ApiTester $I)
+    protected function getApiKeyFromResponse(ApiTester $I)
     {
-//        $I->sendPOST('auth/login', [
-//            'email' => $this->userEmail,
-//            'password' => $this->userPassword
-//        ]);
-//        $I->seeResponseCodeIs(200);
-//        $I->seeResponseContains('api_key');
-//        $this->setApiKey($I);
-    }
+        $response = $I->grabDataFromResponseByJsonPath('$.');
+        $result = $response[0]['api_key'] ?? null;
 
-    protected function setApiKey(ApiTester $I)
-    {
-//        $response = $I->grabDataFromResponseByJsonPath('$.');
-//        $this->apiKey = $response[0]['result']['api_key'];
+        return $result;
     }
 }

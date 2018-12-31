@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "113c6dc158f2fd0ee4f4cba70f2b1aa6",
+    "content-hash": "7c54a0004294eb9dc9a80c6f1258e9eb",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -387,7 +387,7 @@
                 "php",
                 "queryobject"
             ],
-            "time": "2018-12-27T20:37:11+00:00"
+            "time": "2018-12-31T03:58:04+00:00"
         },
         {
             "name": "doctrine/doctrine-bundle",
@@ -1201,6 +1201,47 @@
                 "static"
             ],
             "time": "2018-12-12T20:24:29+00:00"
+        },
+        {
+            "name": "flow/jsonpath",
+            "version": "0.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/FlowCommunications/JSONPath.git",
+                "reference": "f0222818d5c938e4ab668ab2e2c079bd51a27112"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/FlowCommunications/JSONPath/zipball/f0222818d5c938e4ab668ab2e2c079bd51a27112",
+                "reference": "f0222818d5c938e4ab668ab2e2c079bd51a27112",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "peekmo/jsonpath": "dev-master",
+                "phpunit/phpunit": "^4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Flow\\JSONPath": "src/",
+                    "Flow\\JSONPath\\Test": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stephen Frank",
+                    "email": "stephen@flowsa.com"
+                }
+            ],
+            "description": "JSONPath implementation for parsing, searching and flattening arrays",
+            "time": "2018-03-04T16:39:47+00:00"
         },
         {
             "name": "friendsofsymfony/rest-bundle",
@@ -4613,12 +4654,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Codeception/Codeception.git",
-                "reference": "91a08823d2a5a71363b781f75025bc6638791e38"
+                "reference": "a193333086bde158915c44a800070ad38c352d8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Codeception/Codeception/zipball/91a08823d2a5a71363b781f75025bc6638791e38",
-                "reference": "91a08823d2a5a71363b781f75025bc6638791e38",
+                "url": "https://api.github.com/repos/Codeception/Codeception/zipball/a193333086bde158915c44a800070ad38c352d8d",
+                "reference": "a193333086bde158915c44a800070ad38c352d8d",
                 "shasum": ""
             },
             "require": {
@@ -4697,7 +4738,7 @@
                 "functional testing",
                 "unit testing"
             ],
-            "time": "2018-12-30T11:37:48+00:00"
+            "time": "2018-12-31T10:29:27+00:00"
         },
         {
             "name": "codeception/phpunit-wrapper",

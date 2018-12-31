@@ -2,7 +2,6 @@
 namespace App\Security;
 
 use App\Entity\User;
-use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,15 +13,13 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use App\Service\RedisService;
+use App\Helpers\AuthHelper;
 
 class ApiKeyAuthenticator extends AbstractGuardAuthenticator
 {
-    const API_KEY_HEADER_ATTRIBUTE_NAME = 'X-API-KEY';
-
     private $em;
     private $passwordEncoder;
     private $redisService;
-    private $userService;
 
     public function __construct(EntityManagerInterface $em, UserPasswordEncoderInterface $passwordEncoder,
         RedisService $redisService)
@@ -40,7 +37,7 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
     public function getCredentials(Request $request)
     {
         return array(
-            'api_key' => $request->headers->get(self::API_KEY_HEADER_ATTRIBUTE_NAME),
+            'api_key' => $request->headers->get(AuthHelper::API_KEY_HEADER_NAME),
         );
     }
 
@@ -50,7 +47,8 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
             return null;
         }
         $userId = $this->redisService->getUserIdByApiKey($credentials['api_key']);
-        $user = $this->userService->getById($userId);
+        $userRepository = $this->em->getRepository(User::class);
+        $user = $userRepository->find($userId);
         if (!$user instanceof User) {
             return null;
         }
@@ -71,7 +69,7 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         $data = array(
-            'message' => 'Bad credentials'
+            'message' => 'Invalid credentials'
         );
 
         return new JsonResponse($data, Response::HTTP_FORBIDDEN);

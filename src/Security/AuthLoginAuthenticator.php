@@ -17,7 +17,6 @@ class AuthLoginAuthenticator extends AbstractGuardAuthenticator
 {
     private $em;
     private $passwordEncoder;
-    private $userService;
 
     public function __construct(EntityManagerInterface $em, UserPasswordEncoderInterface $passwordEncoder)
     {
@@ -45,7 +44,7 @@ class AuthLoginAuthenticator extends AbstractGuardAuthenticator
         $requestBody = $request->getContent();
         $requestData = @json_decode($requestBody, true);
 
-        return $requestData;
+        return $requestData ?? [];
     }
 
     public function getUser($credentials, UserProviderInterface $userProvider)
