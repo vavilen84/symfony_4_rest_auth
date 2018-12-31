@@ -89,25 +89,25 @@ docker-compose up -d --build
 
 install composer libs
 ```
-docker exec -it --user 1000 symfony4basicskeleton_php_1 composer install
+docker exec -it --user 1000 symfony4restauth_php_1 composer install
 ```
 
 create db schema if not exists
 ```
-docker exec -it --user="www-data" symfony4basicskeleton_php_1 bin/console doctrine:schema:create
+docker exec -it --user 1000 symfony4restauth_php_1 bin/console doctrine:schema:create
 ```
 
 run migrations
 ```
-docker exec -it --user="www-data" symfony4basicskeleton_php_1 bin/console doctrine:migrations:migrate
+docker exec -it --user 1000 symfony4restauth_php_1 bin/console doctrine:migrations:migrate
 ```
 
 run fixtures
 ```
-docker exec -it --user="www-data" symfony4basicskeleton_php_1 bin/console doctrine:fixtures:load (required for codeception tests!!!)
+docker exec -it --user 1000 symfony4restauth_php_1 bin/console doctrine:fixtures:load (required for codeception tests!!!)
 ```
 
-where symfony4basicskeleton_php_1 php container name
+where symfony4restauth_php_1 php container name
 
 ## XDEBUG
 set alias 10.254.254.254 to 127.0.0.1 network interface for XDEBUG
@@ -122,7 +122,7 @@ $ sudo ifconfig lo:0 10.254.254.254 up
 ## Codeception tests
 goto container
 ```
-$ docker exec -it --user="www-data" symfony4basicskeleton_php_1 bash
+$ docker exec -it --user 1000 symfony4restauth_php_1 bash
 $ cd codeception
 ```
 run all tests
