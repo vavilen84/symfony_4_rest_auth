@@ -1,5 +1,5 @@
 <?php
-namespace App\Tests;
+
 
 /**
  * Inherited Methods
@@ -16,9 +16,9 @@ namespace App\Tests;
  *
  * @SuppressWarnings(PHPMD)
 */
-class FunctionalTester extends \Codeception\Actor
+class ApiTester extends \Codeception\Actor
 {
-    use _generated\FunctionalTesterActions;
+    use _generated\ApiTesterActions;
 
    /**
     * Define custom actions here

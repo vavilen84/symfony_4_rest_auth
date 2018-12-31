@@ -23,5 +23,19 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
+    app.enity_listener.user_listener:
+          class: App\EntityListener\UserListener
+          tags:
+              - { name: doctrine.orm.entity_listener, lazy: true }
+
+    app.security.api_key_authenticator:
+        class: App\Security\ApiKeyAuthenticator
+        autowire: true
+    app.security.auth_login_authenticator:
+        class: App\Security\AuthLoginAuthenticator
+        autowire: true
+
+
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

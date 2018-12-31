@@ -47,6 +47,10 @@ RUN apt-get update && \
 #RUN curl --silent --show-error https://getcomposer.org/installer | php
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+#composer fixes (exhausted memory error) - comment if not sure
+RUN touch /usr/local/etc/php/conf.d/memory_limit.ini \
+    && echo "memory_limit = 2000M;" >> /usr/local/etc/php/conf.d/memory_limit.ini
+
 # xdebug
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 COPY xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini.tmp
