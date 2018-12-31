@@ -1,4 +1,4 @@
-# Implement symfony 4 based REST authentication
+# Implement Symfony 4 based REST authentication
 
 ## Authentication flow:
 Login Request:
@@ -30,51 +30,34 @@ Status 200
 ```
 Go to secured area without X-API-KEY header should cause 401 response
 ```yaml
-Status 401
+Status 403
 {
-    "message": "Authentication required"
+    "message": "Invalid credentials"
 }
 ```
 Requests to "open" area always should give 200 response code 
-
-Redis will store our api keys
+Api Key should be stored in Redis
 
 ## Implementation
 
 ### Create application skeleton
-First of all I have taken my variation of base symfony skeleton from here [https://github.com/vavilen84/symfony_4_basic_skeleton](https://github.com/vavilen84/symfony_4_basic_skeleton)
-But if you need your custom skeleton - follow official [docs](https://symfony.com/doc/2.6/cookbook/install/index.html) or use a command
-```yaml
-composer create-project symfony/skeleton "4.*" --stability=dev
-
+Use my application skeleton from here [https://github.com/vavilen84/symfony_4_basic_skeleton](https://github.com/vavilen84/symfony_4_basic_skeleton)<br>
+or create you own by running command:
 ```
+$ composer create-project symfony/skeleton "4.*" --stability=dev
+```
+Further information contains docker commands, so I recommend to use my skeleton for investigation.
 
-### Add next lines to composer.json
+### Security bundle
+[official docs](https://symfony.com/doc/current/security.html)<br>
+add this line to composer.json 
 ```yaml
 "symfony/security-bundle": "^4.0",
-"symfony/serializer": "^4.0",
-"friendsofsymfony/rest-bundle": "^2.4"
 ```
-and install required bundles
+and install(or update) dependencies
+
 ```
 $ docker exec -it --user 1000 symfony4restauth_php_1 composer update
-```
-
-This project contains only simple basic implementation - so our classes are very simple.
-
-## Configure FOS rest bundle
-[official docs](https://symfony.com/doc/master/bundles/FOSRestBundle/index.html)
-```yaml
-config/ros_rest.yml
-
-fos_rest:
-    routing_loader: true
-    view:
-        view_response_listener:  true
-    format_listener:
-        rules:
-            - { path: ^/, prefer_extension: true, fallback_format: json, priorities: [ json ] }
-
 ```
 
 ## User Entity 
@@ -84,13 +67,13 @@ fos_rest:
 $ docker exec -it --user 1000 symfony4restauth_php_1 bin/console make:user
 
 ```
-
-submit default values
+submit default values during generating entity
 
 #### Add email validator
 
 ```php
-//src/Entity/User.php
+<?php
+// src/Entity/User.php
 
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -106,15 +89,13 @@ private $email;
 
 ```
  
-#### Add EntityListener (for password encoding) ()
+#### Add EntityListener (for password encoding)
 
-[official docs](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/events.html#lifecycle-events)
-
-create a new file src/EntityListener/UserListener.php 
+[official docs](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/events.html#lifecycle-events)<br>
 
 ```php
 <?php
-//src/EntityListener/UserListener.php
+// src/EntityListener/UserListener.php
 
 namespace App\EntityListener;
 
@@ -155,9 +136,9 @@ class UserListener
 ```
 
 #### Register listener.
- 
-Add to config/services.yaml:
+
 ```yaml
+# config/services.yaml:
 services:
   app.enity_listener.user_listener:
         class: App\EntityListener\UserListener
@@ -165,7 +146,8 @@ services:
             - { name: doctrine.orm.entity_listener, lazy: true }
 ```
 
-Add new line to entity
+Add a new line to User entity
+
 ```php
 <?php
 // src/Entity/User.php
@@ -194,13 +176,14 @@ class User implements UserInterface
 ```
 
 ## Setup security component
-add new lines to security.firewalls section
+
 ```yaml
-//config/security.yaml
+# config/security.yaml
 
 security:
     firewalls:
         auth:
+            stateless: true
             pattern: ^/auth
             logout: ~
             anonymous: ~
@@ -208,6 +191,7 @@ security:
                 authenticators:
                   - app.security.auth_login_authenticator
         secured:
+            stateless: true
             pattern: ^/secured
             logout: ~
             anonymous: ~
@@ -220,14 +204,16 @@ security:
 ## Helpers
 
 ## Add helper (for super-secure api_key hash generating :-)) 
-create src/Helpers/AuthHelper.php
+
 ```php
 <?php
-
+// src/Helpers/AuthHelper.php
 namespace App\Helpers;
 
 class AuthHelper
 {
+    const API_KEY_HEADER_NAME = 'X-API-KEY';
+    
     public static function generateApiKey(): string
     {
         $result = sha1(self::generateRandomString());
@@ -256,10 +242,9 @@ class AuthHelper
 
 ### Redis service
 
-create new file src/Service/Redis.php
 ```php
 <?php
-
+// src/Service/Redis.php
 namespace App\Service;
 
 use App\Entity\User;
@@ -299,10 +284,16 @@ class RedisService
 
 ## Auth Guards 
  
+This is the main part of authentication
+
 ### Login Authenticator (for login action only)
-Create new file src/Security/ApiKeyAuthenticator.php
+
+This authenticator will check email and password on login action
+
 ```php
 <?php
+// src/Security/ApiKeyAuthenticator.php
+
 namespace App\Security;
 
 use App\Entity\User;
@@ -316,19 +307,21 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use App\Service\UserService;
+use App\Service\RedisService;
+use App\Helpers\AuthHelper;
 
-class AuthLoginAuthenticator extends AbstractGuardAuthenticator
+class ApiKeyAuthenticator extends AbstractGuardAuthenticator
 {
     private $em;
     private $passwordEncoder;
-    private $userService;
+    private $redisService;
 
-    public function __construct(EntityManagerInterface $em, UserPasswordEncoderInterface $passwordEncoder, UserService $userService)
+    public function __construct(EntityManagerInterface $em, UserPasswordEncoderInterface $passwordEncoder,
+        RedisService $redisService)
     {
         $this->em = $em;
         $this->passwordEncoder = $passwordEncoder;
-        $this->userService = $userService;
+        $this->redisService = $redisService;
     }
 
     public function supports(Request $request)
@@ -336,50 +329,42 @@ class AuthLoginAuthenticator extends AbstractGuardAuthenticator
         return true;
     }
 
-    public function getCredentials(Request $request): array
+    public function getCredentials(Request $request)
     {
-        $data = $this->getRequestData($request);
-
-        return [
-            'email' => $data['email'] ?? null,
-            'password' => $data['password'] ?? null
-        ];
-    }
-
-    protected function getRequestData(Request $request): array
-    {
-        $requestBody = $request->getContent();
-        $requestData = @json_decode($requestBody, true);
-
-        return $requestData;
+        return array(
+            'api_key' => $request->headers->get(AuthHelper::API_KEY_HEADER_NAME),
+        );
     }
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        $user = $this->userService->findByEmail($credentials['email']);
+        if (empty($credentials['api_key'])) {
+            return null;
+        }
+        $userId = $this->redisService->getUserIdByApiKey($credentials['api_key']);
+        $userRepository = $this->em->getRepository(User::class);
+        $user = $userRepository->find($userId);
+        if (!$user instanceof User) {
+            return null;
+        }
 
         return $user;
     }
 
     public function checkCredentials($credentials, UserInterface $user): bool
     {
-        $password = $credentials['password'];
-        if ($this->passwordEncoder->isPasswordValid($user, $password)) {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        $request->request->set('key', 'value');
+
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         $data = array(
-            'message' => strtr($exception->getMessageKey(), $exception->getMessageData())
+            'message' => 'Invalid credentials'
         );
 
         return new JsonResponse($data, Response::HTTP_FORBIDDEN);
@@ -399,22 +384,201 @@ class AuthLoginAuthenticator extends AbstractGuardAuthenticator
         return false;
     }
 }
+```
 
+If email and password okay - then AuthController loginAction will generate api key and return it in a response. 
+This api key is required as X-API-KEY header for SecuredController actions. 
+
+### ApiKey Authenticator (for secured area)
+
+This authenticator validate X-API-KEY header for SecuredController actions
+
+```php
+<?php
+namespace App\Security;
+
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use App\Service\RedisService;
+use App\Helpers\AuthHelper;
+
+class ApiKeyAuthenticator extends AbstractGuardAuthenticator
+{
+    private $em;
+    private $passwordEncoder;
+    private $redisService;
+
+    public function __construct(EntityManagerInterface $em, UserPasswordEncoderInterface $passwordEncoder,
+        RedisService $redisService)
+    {
+        $this->em = $em;
+        $this->passwordEncoder = $passwordEncoder;
+        $this->redisService = $redisService;
+    }
+
+    public function supports(Request $request)
+    {
+        return true;
+    }
+
+    public function getCredentials(Request $request)
+    {
+        return array(
+            'api_key' => $request->headers->get(AuthHelper::API_KEY_HEADER_NAME),
+        );
+    }
+
+    public function getUser($credentials, UserProviderInterface $userProvider)
+    {
+        if (empty($credentials['api_key'])) {
+            return null;
+        }
+        $userId = $this->redisService->getUserIdByApiKey($credentials['api_key']);
+        $userRepository = $this->em->getRepository(User::class);
+        $user = $userRepository->find($userId);
+        if (!$user instanceof User) {
+            return null;
+        }
+
+        return $user;
+    }
+
+    public function checkCredentials($credentials, UserInterface $user): bool
+    {
+        return true;
+    }
+
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    {
+
+    }
+
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    {
+        $data = array(
+            'message' => 'Invalid credentials'
+        );
+
+        return new JsonResponse($data, Response::HTTP_FORBIDDEN);
+    }
+
+    public function start(Request $request, AuthenticationException $authException = null)
+    {
+        $data = array(
+            'message' => 'Authentication Required'
+        );
+
+        return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
+    }
+
+    public function supportsRememberMe()
+    {
+        return false;
+    }
+}
 ```
 
 ## Controllers
 
-We will have 3 controllers:<br>
-AuthController - contain login method<br>
-OpenController - should give 200 response for both (authenticated and non-authenticated) user types
-SecuredController - should return 401 for non-authentiacted users and 200 for authenticated 
-
-### AuthController
-
-### Generate  controllers
+you can generate controller by command
 ```
 $ docker exec -it --user 1000 symfony4restauth_php_1 bin/console make:controller
 ```
+
+### AuthController
+```php
+<?php
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use FOS\RestBundle\Controller\Annotations\Post;
+use Symfony\Component\Routing\Annotation\Route;
+use App\Helpers\AuthHelper;
+use App\Service\RedisService;
+
+/**
+ * @Route("/auth")
+ */
+class AuthController extends AbstractController
+{
+    /**
+     * @Post("/login")
+     */
+    public function loginAction(RedisService $redisService)
+    {
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $apiKey = AuthHelper::generateApiKey();
+        $redisService->setApiKey($user, $apiKey);
+
+        return $this->json(['api_key' => $apiKey]);
+    }
+}
+
+```
+### OpenController
+```php
+<?php
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use FOS\RestBundle\Controller\Annotations\Get;
+use Symfony\Component\Routing\Annotation\Route;
+
+/**
+ * @Route("/open")
+ */
+class OpenController extends AbstractController
+{
+    /**
+     * @Get("/index")
+     */
+    public function indexAction()
+    {
+        return $this->json(['data' => 'Success!']);
+    }
+}
+
+```
+### SecuredController
+```php
+<?php
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
+use FOS\RestBundle\Controller\Annotations\Get;
+
+/**
+ * @Route("/secured")
+ */
+class SecuredController extends AbstractController
+{
+    /**
+     * @Get("/index")
+     */
+    public function index()
+    {
+        return $this->json(['data' => 'Success!']);
+    }
+}
+
+```
+
+Thats all!
+[Project repository link](https://github.com/vavilen84/symfony_4_rest_auth)
+
 
 
 

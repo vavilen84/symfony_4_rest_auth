@@ -1,0 +1,143 @@
+{
+  "variables": [],
+  "info": {
+    "name": "Symfony_4_REST_AUTH",
+    "_postman_id": "4d69ea6d-ff5a-3cf7-48b9-4c3ed121fbfe",
+    "description": "",
+    "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "description": "",
+      "item": [
+        {
+          "name": "auth/login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "postman.setEnvironmentVariable(\"api_key\", jsonData.api_key);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "url": {
+              "raw": "{{host}}/auth/login",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ],
+              "variable": []
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "description": ""
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "description": ""
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\"\n}"
+            },
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Open",
+      "description": "",
+      "item": [
+        {
+          "name": "open/index",
+          "request": {
+            "url": {
+              "raw": "{{host}}/open/index",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "open",
+                "index"
+              ],
+              "variable": []
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "description": ""
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "description": ""
+              }
+            ],
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Secured",
+      "description": "",
+      "item": [
+        {
+          "name": "secured/index",
+          "request": {
+            "url": {
+              "raw": "{{host}}/secured/index",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "secured",
+                "index"
+              ],
+              "variable": []
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "description": ""
+              },
+              {
+                "key": "X-API-KEY",
+                "value": "{{api_key}}",
+                "description": ""
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "description": ""
+              }
+            ],
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
