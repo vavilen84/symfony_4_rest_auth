@@ -2,7 +2,9 @@
 - Docker (php + nginx + postgres + adminer + redis)
 - Codeception 
 - XDebug
+- Postman collection
 - [Implementation docs](https://github.com/vavilen84/symfony_4_rest_auth/blob/master/docs/implement_rest_auth.md)
+
 ##  Install Docker 
 
 https://docs.docker.com/install/
