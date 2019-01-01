@@ -1,4 +1,4 @@
-# Symfony 4.* basic application skeleton includes:
+# Symfony 4.* based REST auth basic implementation app includes:
 - Docker (php + nginx + postgres + adminer + redis)
 - Codeception 
 - XDebug
@@ -120,6 +120,16 @@ $ sudo ifconfig lo:0 10.254.254.254 up
 "http://adminer.symfony4restauth_local:8080/" - adminer
 
 ## Codeception tests
+create db schema (if not created yet)
+```
+$ docker exec -it --user 1000 symfony4restauth_php_1 bin/console doctrine:schema:create 
+```
+
+upload fixtures
+```
+$ docker exec -it --user 1000 symfony4restauth_php_1 bin/console doctrine:fixtures:load 
+```
+
 goto container
 ```
 $ docker exec -it --user 1000 symfony4restauth_php_1 bash
