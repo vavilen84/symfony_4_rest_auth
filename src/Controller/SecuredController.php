@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use FOS\RestBundle\Controller\Annotations\Get;
 
 /**
  * @Route("/secured")
@@ -12,7 +11,7 @@ use FOS\RestBundle\Controller\Annotations\Get;
 class SecuredController extends AbstractController
 {
     /**
-     * @Get("/index")
+     * @Route("/index")
      */
     public function index()
     {

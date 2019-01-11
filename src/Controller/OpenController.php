@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use FOS\RestBundle\Controller\Annotations\Get;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -12,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class OpenController extends AbstractController
 {
     /**
-     * @Get("/index")
+     * @Route("/index")
      */
     public function indexAction()
     {

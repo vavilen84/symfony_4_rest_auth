@@ -501,7 +501,6 @@ $ docker exec -it --user 1000 symfony4restauth_php_1 bin/console make:controller
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use FOS\RestBundle\Controller\Annotations\Post;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Helpers\AuthHelper;
 use App\Service\RedisService;
@@ -512,7 +511,7 @@ use App\Service\RedisService;
 class AuthController extends AbstractController
 {
     /**
-     * @Post("/login")
+     * @Route("/login")
      */
     public function loginAction(RedisService $redisService)
     {
@@ -532,7 +531,6 @@ class AuthController extends AbstractController
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use FOS\RestBundle\Controller\Annotations\Get;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -541,7 +539,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class OpenController extends AbstractController
 {
     /**
-     * @Get("/index")
+     * @Route("/index")
      */
     public function indexAction()
     {
@@ -558,7 +556,6 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use FOS\RestBundle\Controller\Annotations\Get;
 
 /**
  * @Route("/secured")
@@ -566,7 +563,7 @@ use FOS\RestBundle\Controller\Annotations\Get;
 class SecuredController extends AbstractController
 {
     /**
-     * @Get("/index")
+     * @Route("/index")
      */
     public function index()
     {

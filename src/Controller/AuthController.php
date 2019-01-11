@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use FOS\RestBundle\Controller\Annotations\Post;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Helpers\AuthHelper;
 use App\Service\RedisService;
@@ -14,7 +13,7 @@ use App\Service\RedisService;
 class AuthController extends AbstractController
 {
     /**
-     * @Post("/login")
+     * @Route("/login")
      */
     public function loginAction(RedisService $redisService)
     {
