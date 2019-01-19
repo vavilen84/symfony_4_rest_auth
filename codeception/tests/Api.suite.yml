@@ -7,10 +7,10 @@ modules:
         - Asserts
     config:
         PhpBrowser:
-            url: 'http://site.symfony4restauth_local'
+            url: 'http://site.symfony_4_rest_auth_local'
         REST:
             depends: PhpBrowser
-            url: 'http://site.symfony4restauth_local'
+            url: 'http://site.symfony_4_rest_auth_local'
         Db:
             dsn: 'pgsql:host=postgres;dbname=symfony'
             user: 'symfony'
