@@ -1,11 +1,11 @@
 {
   "id": "5320c982-e81c-b20c-06b2-4a4d390ad676",
-  "name": "symfony4restauth_dev",
+  "name": "symfony_4_rest_auth_dev",
   "values": [
     {
       "enabled": true,
       "key": "host",
-      "value": "site.symfony4restauth_local",
+      "value": "site.symfony_4_rest_auth_local",
       "type": "text"
     },
     {
