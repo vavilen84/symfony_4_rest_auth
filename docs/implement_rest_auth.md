@@ -1,6 +1,7 @@
 # Implement Symfony 4 based REST authentication
 
 ## Authentication flow:
+
 Login Request:
 ```yaml
 POST /auth/login
@@ -9,6 +10,7 @@ POST /auth/login
     "password": "secretpassword"
 }
 ```
+
 Response:
 ```yaml
 Status 200
@@ -16,11 +18,13 @@ Status 200
     "api_key": "s8g7v6wl5jh6lk2lks09bdd87fg76as0"
 }
 ```
+
 Go to secured area 
 ```yaml
 HEADER X-API-KEY: s8g7v6wl5jh6lk2lks09bdd87fg76as0
 GET /secured/page
 ```
+
 Response:
 ```yaml
 Status 200
@@ -28,6 +32,7 @@ Status 200
     "content": "Success!"
 }
 ```
+
 Go to secured area without X-API-KEY header should cause 401 response
 ```yaml
 Status 403
@@ -35,38 +40,20 @@ Status 403
     "message": "Invalid credentials"
 }
 ```
-Requests to "open" area always should give 200 response code 
+
+Requests to "open" area always should give 200 response code.
 Api Key should be stored in Redis
 
 ## Implementation
-
-### Create application skeleton
-Use my application skeleton from here [https://github.com/vavilen84/symfony_4_basic_skeleton](https://github.com/vavilen84/symfony_4_basic_skeleton)<br>
-or create you own by running command:
-```
-$ composer create-project symfony/skeleton "4.*" --stability=dev
-```
-Further information contains docker commands, so I recommend to use my skeleton for investigation.
-
-### Security bundle
-[official docs](https://symfony.com/doc/current/security.html)<br>
-add this line to composer.json 
-```yaml
-"symfony/security-bundle": "^4.0",
-```
-and install(or update) dependencies
-
-```
-$ docker exec -it --user 1000 symfony4restauth_php_1 composer update
-```
 
 ## User Entity 
 
 #### Generate entity:
 ```
-$ docker exec -it --user 1000 symfony4restauth_php_1 bin/console make:user
+$ docker exec -it --user 1000 symfony_4_rest_auth_php_1 bin/console make:user
 
 ```
+
 submit default values during generating entity
 
 #### Add email validator
@@ -131,8 +118,6 @@ class UserListener
         $user->setPassword($encodedPassword);
     }
 }
-
-
 ```
 
 #### Register listener.
@@ -491,7 +476,7 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
 
 you can generate controller by command
 ```
-$ docker exec -it --user 1000 symfony4restauth_php_1 bin/console make:controller
+$ docker exec -it --user 1000 symfony_4_rest_auth_php_1 bin/console make:controller
 ```
 
 ### AuthController
@@ -524,7 +509,9 @@ class AuthController extends AbstractController
 }
 
 ```
+
 ### OpenController
+
 ```php
 <?php
 
@@ -548,6 +535,7 @@ class OpenController extends AbstractController
 }
 
 ```
+
 ### SecuredController
 ```php
 <?php
@@ -574,7 +562,7 @@ class SecuredController extends AbstractController
 ```
 
 Thats all!
-[Project repository link](https://github.com/vavilen84/symfony_4_rest_auth)
+
 
 
 
